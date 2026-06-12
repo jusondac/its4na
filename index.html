@@ -30,7 +30,7 @@
     }
 
     /* ==========================================================================
-       DESKTOP 3D CORE MECHANICS
+       DESKTOP 3D CORE MECHANICS (Default)
        ========================================================================== */
     .sheet {
       position: absolute;
@@ -68,44 +68,53 @@
     }
 
     /* ==========================================================================
-       MOBILE RESPONSIVENESS OVERRIDES
+       MOBILE RESPONSIVENESS OVERRIDES (Linear Stack System)
        ========================================================================== */
     @media (max-width: 767px) {
+      .book-viewport {
+        perspective: none;
+        /* Turn off 3D clutter on mobile */
+      }
+
       .sheet {
         width: 100%;
+        height: 100%;
+        left: 0;
         right: 0;
-        transform-origin: left center;
+        transform: none !important;
+        /* Ignore 3D rotate rules */
+        transform-style: flat;
+        pointer-events: none;
       }
 
+      /* Stack fronts and backs sequentially as standalone views */
+      .front,
       .back {
-        transform: rotateY(0deg);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: none !important;
+        backface-visibility: visible;
         opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
-      }
-
-      .sheet.flipped {
-        transform: rotateY(-180deg);
-      }
-
-      .sheet.flipped .front {
-        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
         pointer-events: none;
       }
 
-      .sheet.flipped .back {
+      /* Active page handler logic managed by JS state */
+      .front.active-page,
+      .back.active-page {
         opacity: 1;
         pointer-events: auto;
-        transform: rotateY(-180deg);
+        z-index: 100 !important;
       }
     }
 
     /* ==========================================================================
-       FULL BLEED IMAGE PAGE CONFIGURATION (Page 3)
+       FULL BLEED IMAGE PAGE CONFIGURATION
        ========================================================================== */
-    .front.full-image-page {
+    .front.full-image-page,
+    .back.full-image-page {
       padding: 0 !important;
-      /* Removes all spacing around the edge */
       overflow: hidden;
     }
 
@@ -113,7 +122,6 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      /* Crops cleanly to fill the space without distortion */
       display: block;
     }
 
@@ -128,7 +136,7 @@
     }
 
     .poem {
-      font-size: clamp(1rem, 3vw, 1.5rem);
+      font-size: clamp(1rem, 3.5vw, 1.5rem);
       color: #ccc;
       margin-top: 20px;
       max-width: 80%;
@@ -139,7 +147,7 @@
 
     .hint {
       font-size: 0.85rem;
-      color: #444;
+      color: #666;
       margin-top: 25px;
       display: block;
       text-transform: uppercase;
@@ -150,13 +158,11 @@
       position: absolute;
       bottom: 4vh;
       font-size: 0.9rem;
-      color: #333;
+      color: #666;
       font-family: sans-serif;
       z-index: 10;
-      /* Keeps number visible above the image */
     }
 
-    /* Make the page number readable on top of a photo */
     .full-image-page .page-number {
       color: rgba(255, 255, 255, 0.6);
       background: rgba(0, 0, 0, 0.4);
@@ -176,8 +182,9 @@
 
       .front .page-number,
       .back .page-number {
-        left: 6vw;
+        left: 50%;
         right: auto;
+        transform: translateX(-50%);
       }
     }
 
@@ -211,7 +218,7 @@
 
     <!-- SHEET 1: Holds Page 1 (Front) & Page 2 (Back) -->
     <div class="sheet" id="s1" style="z-index: 4;">
-      <div class="front">
+      <div class="front active-page">
         <div class="content">
           Happy birthday Ana
           <span class="hint">Una tarjeta sencilla creada para expresar que eres especial.</span>
@@ -234,7 +241,6 @@
     <!-- SHEET 2: Holds Page 3 (Front - Full Screen Image) & Page 4 (Back) -->
     <div class="sheet" id="s2" style="z-index: 3;">
       <div class="front full-image-page">
-        <!-- Replace "your-photo.jpg" with your actual filename -->
         <img src="./images/ana.png" alt="Photo for Ana" class="full-bleed-img">
         <div class="page-number">3</div>
       </div>
@@ -260,7 +266,8 @@
       </div>
       <div class="back">
         <div class="content">Me</div>
-        <p class="poem">Y para mí, eres una mujer extraordinaria, fuerte y tan perfecta. Es difícil creer que seas la segunda mujer
+        <p class="poem">Y para mí, eres una mujer extraordinaria, fuerte y tan perfecta. Es difícil creer que seas la
+          segunda mujer
           que admiro
           después de mi madre. Sin embargo, en mi corazón hay un trono para ti. Y ahora quizá ya no exista un “yo”, solo
           tú.</p>
@@ -268,17 +275,21 @@
       </div>
     </div>
 
-    <!-- SHEET 4: Holds Page 7 (Front) & Blank End Buffer -->
+    <!-- SHEET 4: Holds Page 7 (Front) & Page 8 (Back) -->
     <div class="sheet" id="s4" style="z-index: 1;">
-      <div class="front">
+      <div class="front full-image-page">
         <img src="./images/ana2.png" alt="Photo for Ana" class="full-bleed-img">
         <div class="page-number">7</div>
       </div>
       <div class="back">
-        <p class="poem">Una carta sencilla: que la felicidad llegue a ti y la paz permanezca en tu corazón. Tu corazón, lleno de flores del
-        cielo en flor, hace que el mundo crea. Por ti, el mundo cree que la belleza puede nacer de un corazón puro. Me haces
-        creer que el amor existe. Tú, tú y tu ser están bendecidos por algo tan hermoso, y Dios lo ha nombrado Analia Evelyn
-        Hein</p>
+        <p class="poem">Una carta sencilla: que la felicidad llegue a ti y la paz permanezca en tu corazón. Tu corazón,
+          lleno de flores del
+          cielo en flor, hace que el mundo crea. Por ti, el mundo cree que la belleza puede nacer de un corazón puro. Me
+          haces
+          creer que el amor existe. Tú, tú y tu ser están bendecidos por algo tan hermoso, y Dios lo ha nombrado Analia
+          Evelyn
+          Hein</p>
+        <div class="page-number">8</div>
       </div>
     </div>
 
@@ -295,22 +306,67 @@
       document.querySelector("#s4")
     ];
 
+    // Select all individual pages across sheets sequentially
+    const pages = document.querySelectorAll('.front, .back');
+    let mobilePageIndex = 0;
     let currentSheetIndex = 0;
     const totalSheets = sheets.length;
 
+    // Helper to verify if the viewport is running on a phone/tablet layout
+    function isMobile() {
+      return window.innerWidth <= 767;
+    }
+
+    // Handle forward navigation clicks
     rightSide.addEventListener("click", () => {
-      if (currentSheetIndex < totalSheets) {
-        sheets[currentSheetIndex].classList.add("flipped");
-        sheets[currentSheetIndex].style.zIndex = currentSheetIndex + 1;
-        currentSheetIndex++;
+      if (isMobile()) {
+        if (mobilePageIndex < pages.length - 1) {
+          pages[mobilePageIndex].classList.remove("active-page");
+          mobilePageIndex++;
+          pages[mobilePageIndex].classList.add("active-page");
+        }
+      } else {
+        // Desktop 3D engine rules logic
+        if (currentSheetIndex < totalSheets) {
+          sheets[currentSheetIndex].classList.add("flipped");
+          sheets[currentSheetIndex].style.zIndex = currentSheetIndex + 1;
+          currentSheetIndex++;
+        }
       }
     });
 
+    // Handle backward navigation clicks
     leftSide.addEventListener("click", () => {
-      if (currentSheetIndex > 0) {
-        currentSheetIndex--;
-        sheets[currentSheetIndex].classList.remove("flipped");
-        sheets[currentSheetIndex].style.zIndex = totalSheets - currentSheetIndex + 4;
+      if (isMobile()) {
+        if (mobilePageIndex > 0) {
+          pages[mobilePageIndex].classList.remove("active-page");
+          mobilePageIndex--;
+          pages[mobilePageIndex].classList.add("active-page");
+        }
+      } else {
+        // Desktop 3D engine rules logic
+        if (currentSheetIndex > 0) {
+          currentSheetIndex--;
+          sheets[currentSheetIndex].classList.remove("flipped");
+          sheets[currentSheetIndex].style.zIndex = totalSheets - currentSheetIndex + 4;
+        }
+      }
+    });
+
+    // Dynamic reset mechanism if window size properties change on the fly
+    window.addEventListener('resize', () => {
+      if (isMobile()) {
+        // Synchronize linear tracking with sheet structure positions
+        mobilePageIndex = currentSheetIndex * 2;
+        if (mobilePageIndex >= pages.length) mobilePageIndex = pages.length - 1;
+
+        pages.forEach((p, idx) => {
+          if (idx === mobilePageIndex) p.classList.add("active-page");
+          else p.classList.remove("active-page");
+        });
+      } else {
+        // Reinstate default visibility
+        pages.forEach(p => p.classList.remove("active-page"));
       }
     });
   </script>
